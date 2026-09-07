@@ -123,7 +123,8 @@ noncomputable def FinitelyAdditiveMeasure.counting (X:Type*) : FinitelyAdditiveM
     measure := fun E => ENat.card E
     measure_pos := by sorry
     measure_empty := by sorry
-    measure_finite_additive := by sorry
+    measure_finite_additive := fun E F _ _ hdisj =>
+      (ENat.card_union_eq_add_card_of_disjoint hdisj).symm
   }
 
 /-- Exercise 1.4.20(i) -/
