@@ -1716,6 +1716,20 @@ theorem UnsignedMeasurable.TFAE {d:ℕ} {f: EuclideanSpace' d → EReal} (hf: Un
 /-- Exercise 1.3.3(i) -/
 theorem Continuous.UnsignedMeasurable {d:ℕ} {f: EuclideanSpace' d → EReal} (hf: Continuous f) (hnonneg: Unsigned f): UnsignedMeasurable f := by sorry
 
+/-- Unsigned simple functions are nonnegative. -/
+lemma UnsignedSimpleFunction.unsigned {d:ℕ} {f: EuclideanSpace' d → EReal} (hf: UnsignedSimpleFunction f) : Unsigned f := by
+  intro x
+  obtain ⟨k, c, E, hc, heq⟩ := hf
+  rw [heq]
+  simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+  apply Finset.sum_nonneg
+  intro i _
+  have h1 : 0 ≤ c i := (hc i).2
+  have h2 : 0 ≤ EReal.indicator (E i) x := by
+    simp only [EReal.indicator, Real.EReal_fun]
+    exact EReal.coe_nonneg.mpr (Set.indicator_nonneg (fun _ _ => zero_le_one) x)
+  exact mul_nonneg h1 h2
+
 /-- Exercise 1.3.3(ii) -/
 theorem UnsignedSimpleFunction.unsignedMeasurable {d:ℕ} {f: EuclideanSpace' d → EReal} (hf: UnsignedSimpleFunction f): UnsignedMeasurable f := by sorry
 
