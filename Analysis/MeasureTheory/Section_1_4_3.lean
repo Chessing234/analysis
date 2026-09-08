@@ -150,8 +150,13 @@ lemma ConcreteBooleanAlgebra.finite_biUnion_mem {X J:Type*} (B: ConcreteBooleanA
     exact B.union_mem _ _ (hE a) hs
 
 /-- Exercise 1.4.20(i) -/
-theorem FinitelyAdditiveMeasure.mono {X:Type*} {B: ConcreteBooleanAlgebra X} (μ: FinitelyAdditiveMeasure B) {E F : Set X} (hE : B.measurable E) (hF : B.measurable F) (hsub : E ⊆ F) : μ.measure E ≤ μ.measure F :=
-by sorry
+theorem FinitelyAdditiveMeasure.mono {X:Type*} {B: ConcreteBooleanAlgebra X} (μ: FinitelyAdditiveMeasure B) {E F : Set X} (hE : B.measurable E) (hF : B.measurable F) (hsub : E ⊆ F) : μ.measure E ≤ μ.measure F := by
+  have hdiff := B.diff_mem hF hE
+  have hdisj : Disjoint E (F \ E) := disjoint_sdiff_right
+  have hunion : E ∪ (F \ E) = F := Set.union_diff_cancel hsub
+  have hsum := μ.measure_finite_additive E (F \ E) hE hdiff hdisj
+  rw [← hunion, hsum]
+  exact le_add_of_nonneg_right (μ.measure_pos (F \ E) hdiff)
 
 /-- Exercise 1.4.20(ii) -/
 theorem FinitelyAdditiveMeasure.finite_additivity {X:Type*} {B: ConcreteBooleanAlgebra X} (μ: FinitelyAdditiveMeasure B) {J:Type*} {I: Finset J} {E: J → Set X} (hE: ∀ j:J, B.measurable (E j)) (hdisj: Set.univ.PairwiseDisjoint E) :
