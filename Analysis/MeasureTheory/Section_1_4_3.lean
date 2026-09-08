@@ -175,7 +175,22 @@ theorem FinitelyAdditiveMeasure.finite_additivity {X:Type*} {B: ConcreteBooleanA
 
 /-- Exercise 1.4.20(iii) -/
 theorem FinitelyAdditiveMeasure.finite_subadditivity {X:Type*} {B: ConcreteBooleanAlgebra X} (μ: FinitelyAdditiveMeasure B) {J:Type*} {I: Finset J} {E: J → Set X} (hE: ∀ j:J, B.measurable (E j)) :
-  μ.measure (⋃ j ∈ I, E j) ≤ ∑ j ∈ I, μ.measure (E j) := by sorry
+  μ.measure (⋃ j ∈ I, E j) ≤ ∑ j ∈ I, μ.measure (E j) := by
+  classical
+  have htwo : ∀ {A C : Set X}, B.measurable A → B.measurable C →
+      μ.measure (A ∪ C) ≤ μ.measure A + μ.measure C := by
+    intro A C hA hC
+    have hdiff := B.diff_mem hC hA
+    have hdisj : Disjoint A (C \ A) := disjoint_sdiff_right
+    have hunion : A ∪ (C \ A) = A ∪ C := Set.union_diff_self
+    have hsum := μ.measure_finite_additive A (C \ A) hA hdiff hdisj
+    rw [← hunion, hsum]
+    exact add_le_add_left (μ.mono hdiff hC (Set.diff_subset C A)) _
+  refine Finset.induction_on I ?empty ?step
+  · simp [μ.measure_empty]
+  · intro a s ha ih
+    rw [Finset.set_biUnion_insert, Finset.sum_insert ha]
+    exact (htwo (hE a) (B.finite_biUnion_mem hE)).trans (add_le_add_left ih _)
 
 /-- Exercise 1.4.20(iv) -/
 theorem FinitelyAdditiveMeasure.mes_union_add_mes_inter {X:Type*} {B: ConcreteBooleanAlgebra X} (μ: FinitelyAdditiveMeasure B) {E F : Set X}
