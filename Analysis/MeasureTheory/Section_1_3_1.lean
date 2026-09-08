@@ -1064,7 +1064,14 @@ lemma UnsignedSimpleFunction.integral_le_integral_of_aeLe {d:ℕ} {f g: Euclidea
 /-- Exercise 1.3.1(vi) (Compatibility with Lebesgue measure, indicator) -/
 lemma UnsignedSimpleFunction.indicator {d:ℕ} {E: Set (EuclideanSpace' d)} (hE: LebesgueMeasurable E) :
   UnsignedSimpleFunction (Real.toEReal ∘ E.indicator') := by
-  sorry
+  use 1, fun _ => (1 : EReal), fun _ => E
+  constructor
+  · intro
+    exact ⟨hE, zero_le_one⟩
+  · ext x
+    simp only [Function.comp_apply, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+    rw [Fin.sum_univ_one]
+    simp [EReal.indicator, Real.EReal_fun]
 
 /-- Exercise 1.3.1(vi) (Compatibility with Lebesgue measure, integral of an indicator) -/
 lemma UnsignedSimpleFunction.integral_indicator {d:ℕ} {E: Set (EuclideanSpace' d)} (hE: LebesgueMeasurable E) :
