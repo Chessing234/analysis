@@ -24,8 +24,7 @@ noncomputable def EReal.indicator {X:Type*} (A: Set X) : X → EReal := Real.ERe
 theorem EReal.indicator_of_mem {X:Type*} {A: Set X} {x:X} (h: x ∈ A) : EReal.indicator A x = 1 := by
   simp [EReal.indicator, Real.EReal_fun, Set.indicator'_of_mem h]
 
-theorem EReal.indicator_of_notMem {X:Type*} {A: Set X} {x:X} (h: x ∉ A) : EReal.indicator A x = 0 := by
-  simp [EReal.indicator, Real.EReal_fun, Set.indicator'_of_notMem h]
+theorem EReal.indicator_eq_comp {X:Type*} (A: Set X) : EReal.indicator A = Real.toEReal ∘ A.indicator' := rfl
 
 noncomputable def Complex.indicator {X:Type*} (A: Set X) : X → ℂ := Real.complex_fun A.indicator'
 
