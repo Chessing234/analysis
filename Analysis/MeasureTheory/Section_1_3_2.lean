@@ -1731,7 +1731,8 @@ lemma UnsignedSimpleFunction.unsigned {d:ℕ} {f: EuclideanSpace' d → EReal} (
   exact mul_nonneg h1 h2
 
 /-- Exercise 1.3.3(ii) -/
-theorem UnsignedSimpleFunction.unsignedMeasurable {d:ℕ} {f: EuclideanSpace' d → EReal} (hf: UnsignedSimpleFunction f): UnsignedMeasurable f := by sorry
+theorem UnsignedSimpleFunction.unsignedMeasurable {d:ℕ} {f: EuclideanSpace' d → EReal} (hf: UnsignedSimpleFunction f): UnsignedMeasurable f :=
+  ⟨hf.unsigned, fun _ ↦ f, fun _ ↦ hf, fun _ ↦ tendsto_const_nhds⟩
 
 /-- Exercise 1.3.3(iii) -/
 theorem UnsignedMeasurable.sup {d:ℕ} {f: ℕ → EuclideanSpace' d → EReal} (hf: ∀ n, UnsignedMeasurable (f n)) : UnsignedMeasurable (fun x ↦ iSup (fun n ↦ f n x)) := by sorry
