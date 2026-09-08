@@ -1740,7 +1740,23 @@ theorem UnsignedSimpleFunction.unsignedMeasurable {d:ℕ} {f: EuclideanSpace' d 
   ⟨hf.unsigned, fun _ ↦ f, fun _ ↦ hf, fun _ ↦ tendsto_const_nhds⟩
 
 /-- Exercise 1.3.3(iii) -/
-theorem UnsignedMeasurable.sup {d:ℕ} {f: ℕ → EuclideanSpace' d → EReal} (hf: ∀ n, UnsignedMeasurable (f n)) : UnsignedMeasurable (fun x ↦ iSup (fun n ↦ f n x)) := by sorry
+theorem UnsignedMeasurable.sup {d:ℕ} {f: ℕ → EuclideanSpace' d → EReal} (hf: ∀ n, UnsignedMeasurable (f n)) : UnsignedMeasurable (fun x ↦ iSup (fun n ↦ f n x)) := by
+  have hnonneg : Unsigned (fun x ↦ iSup (fun n ↦ f n x)) := by
+    intro x
+    exact le_trans ((hf 0).1 x) (le_iSup (fun n ↦ f n x) 0)
+  have h_iff : UnsignedMeasurable (fun x ↦ iSup (fun n ↦ f n x)) ↔
+      ∀ t, LebesgueMeasurable {x | iSup (fun n ↦ f n x) > t} :=
+    (UnsignedMeasurable.TFAE hnonneg).out 0 4
+  apply h_iff.mpr
+  intro t
+  have h_eq : {x | iSup (fun n ↦ f n x) > t} = ⋃ n, {x | f n x > t} := by
+    ext x
+    simp [lt_iSup_iff]
+  rw [h_eq]
+  refine LebesgueMeasurable.countable_union fun n => ?_
+  have hn : UnsignedMeasurable (f n) ↔ ∀ t, LebesgueMeasurable {x | f n x > t} :=
+    (UnsignedMeasurable.TFAE (hf n).1).out 0 4
+  exact hn.mp (hf n) t
 
 /-- Exercise 1.3.3(iii) -/
 theorem UnsignedMeasurable.inf {d:ℕ} {f: ℕ → EuclideanSpace' d → EReal} (hf: ∀ n, UnsignedMeasurable (f n)) : UnsignedMeasurable (fun x ↦ iInf (fun n ↦ f n x)) := by sorry
