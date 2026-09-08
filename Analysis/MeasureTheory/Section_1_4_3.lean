@@ -152,7 +152,7 @@ lemma ConcreteBooleanAlgebra.finite_biUnion_mem {X J:Type*} (B: ConcreteBooleanA
 /-- Exercise 1.4.20(i) -/
 theorem FinitelyAdditiveMeasure.mono {X:Type*} {B: ConcreteBooleanAlgebra X} (μ: FinitelyAdditiveMeasure B) {E F : Set X} (hE : B.measurable E) (hF : B.measurable F) (hsub : E ⊆ F) : μ.measure E ≤ μ.measure F := by
   have hdiff := B.diff_mem hF hE
-  have hdisj : Disjoint E (F \ E) := disjoint_sdiff_right
+  have hdisj : Disjoint E (F \ E) := Set.disjoint_left.mpr fun _ hxE hxd => hxd.2 hxE
   have hunion : E ∪ (F \ E) = F := Set.union_diff_cancel hsub
   have hsum := μ.measure_finite_additive E (F \ E) hE hdiff hdisj
   rw [← hunion, hsum]
@@ -181,16 +181,16 @@ theorem FinitelyAdditiveMeasure.finite_subadditivity {X:Type*} {B: ConcreteBoole
       μ.measure (A ∪ C) ≤ μ.measure A + μ.measure C := by
     intro A C hA hC
     have hdiff := B.diff_mem hC hA
-    have hdisj : Disjoint A (C \ A) := disjoint_sdiff_right
+    have hdisj : Disjoint A (C \ A) := Set.disjoint_left.mpr fun _ hxA hxd => hxd.2 hxA
     have hunion : A ∪ (C \ A) = A ∪ C := Set.union_diff_self
     have hsum := μ.measure_finite_additive A (C \ A) hA hdiff hdisj
     rw [← hunion, hsum]
-    exact add_le_add_left (μ.mono hdiff hC (Set.diff_subset C A)) _
+    exact add_le_add (le_refl _) (μ.mono hdiff hC Set.diff_subset)
   refine Finset.induction_on I ?empty ?step
   · simp [μ.measure_empty]
   · intro a s ha ih
     rw [Finset.set_biUnion_insert, Finset.sum_insert ha]
-    exact (htwo (hE a) (B.finite_biUnion_mem hE)).trans (add_le_add_left ih _)
+    exact (htwo (hE a) (B.finite_biUnion_mem hE)).trans (add_le_add (le_refl _) ih)
 
 /-- Exercise 1.4.20(iv) -/
 theorem FinitelyAdditiveMeasure.mes_union_add_mes_inter {X:Type*} {B: ConcreteBooleanAlgebra X} (μ: FinitelyAdditiveMeasure B) {E F : Set X}
@@ -198,13 +198,9 @@ theorem FinitelyAdditiveMeasure.mes_union_add_mes_inter {X:Type*} {B: ConcreteBo
   μ.measure (E ∪ F) + μ.measure (E ∩ F) = μ.measure E + μ.measure F := by
   have hinter := B.inter_mem hE hF
   have hdiff := B.diff_mem hF hE
-  have hdisj₁ : Disjoint E (F \ E) := disjoint_sdiff_right
-  have hdisj₂ : Disjoint (E ∩ F) (F \ E) := by
-    rw [Set.disjoint_iff_inter_eq_empty]
-    ext x
-    simp [Set.mem_inter_iff, Set.mem_diff]
-    intro hxE hxF hxE'
-    exact hxE' hxE
+  have hdisj₁ : Disjoint E (F \ E) := Set.disjoint_left.mpr fun _ hxE hxd => hxd.2 hxE
+  have hdisj₂ : Disjoint (E ∩ F) (F \ E) :=
+    Set.disjoint_left.mpr fun _ hx hxd => hxd.2 hx.1
   have h₁ : E ∪ (F \ E) = E ∪ F := Set.union_diff_self
   have h₂ : (E ∩ F) ∪ (F \ E) = F := by
     ext x
