@@ -195,7 +195,24 @@ theorem FinitelyAdditiveMeasure.finite_subadditivity {X:Type*} {B: ConcreteBoole
 /-- Exercise 1.4.20(iv) -/
 theorem FinitelyAdditiveMeasure.mes_union_add_mes_inter {X:Type*} {B: ConcreteBooleanAlgebra X} (μ: FinitelyAdditiveMeasure B) {E F : Set X}
     (hE: B.measurable E) (hF: B.measurable F) :
-  μ.measure (E ∪ F) + μ.measure (E ∩ F) = μ.measure E + μ.measure F := by sorry
+  μ.measure (E ∪ F) + μ.measure (E ∩ F) = μ.measure E + μ.measure F := by
+  have hinter := B.inter_mem hE hF
+  have hdiff := B.diff_mem hF hE
+  have hdisj₁ : Disjoint E (F \ E) := disjoint_sdiff_right
+  have hdisj₂ : Disjoint (E ∩ F) (F \ E) := by
+    rw [Set.disjoint_iff_inter_eq_empty]
+    ext x
+    simp [Set.mem_inter_iff, Set.mem_diff]
+    intro hxE hxF hxE'
+    exact hxE' hxE
+  have h₁ : E ∪ (F \ E) = E ∪ F := Set.union_diff_self
+  have h₂ : (E ∩ F) ∪ (F \ E) = F := by
+    ext x
+    simp [Set.mem_union, Set.mem_inter_iff, Set.mem_diff]
+    tauto
+  have hsum₁ := μ.measure_finite_additive E (F \ E) hE hdiff hdisj₁
+  have hsum₂ := μ.measure_finite_additive (E ∩ F) (F \ E) hinter hdiff hdisj₂
+  rw [← h₁, hsum₁, add_assoc, add_comm (μ.measure (F \ E)), ← hsum₂, h₂]
 
 open Classical in
 /-- Exercise 1.4.21 -/
