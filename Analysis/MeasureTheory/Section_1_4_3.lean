@@ -160,7 +160,18 @@ theorem FinitelyAdditiveMeasure.mono {X:Type*} {B: ConcreteBooleanAlgebra X} (μ
 
 /-- Exercise 1.4.20(ii) -/
 theorem FinitelyAdditiveMeasure.finite_additivity {X:Type*} {B: ConcreteBooleanAlgebra X} (μ: FinitelyAdditiveMeasure B) {J:Type*} {I: Finset J} {E: J → Set X} (hE: ∀ j:J, B.measurable (E j)) (hdisj: Set.univ.PairwiseDisjoint E) :
-  μ.measure (⋃ j ∈ I, E j) = ∑ j ∈ I, μ.measure (E j) := by sorry
+  μ.measure (⋃ j ∈ I, E j) = ∑ j ∈ I, μ.measure (E j) := by
+  classical
+  refine Finset.induction_on I ?empty ?step
+  · simp [μ.measure_empty]
+  · intro a s ha ih
+    rw [Finset.set_biUnion_insert, Finset.sum_insert ha]
+    have hunion : B.measurable (⋃ j ∈ s, E j) := B.finite_biUnion_mem hE
+    have hdisj' : Disjoint (E a) (⋃ j ∈ s, E j) := by
+      rw [Set.disjoint_iUnion₂_right]
+      intro j hj
+      exact hdisj (Set.mem_univ a) (Set.mem_univ j) (ne_of_mem_of_not_mem hj ha).symm
+    rw [μ.measure_finite_additive (E a) (⋃ j ∈ s, E j) (hE a) hunion hdisj', ih]
 
 /-- Exercise 1.4.20(iii) -/
 theorem FinitelyAdditiveMeasure.finite_subadditivity {X:Type*} {B: ConcreteBooleanAlgebra X} (μ: FinitelyAdditiveMeasure B) {J:Type*} {I: Finset J} {E: J → Set X} (hE: ∀ j:J, B.measurable (E j)) :
