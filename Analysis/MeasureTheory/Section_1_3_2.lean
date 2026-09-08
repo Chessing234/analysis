@@ -1759,7 +1759,24 @@ theorem UnsignedMeasurable.sup {d:ℕ} {f: ℕ → EuclideanSpace' d → EReal} 
   exact hn.mp (hf n) t
 
 /-- Exercise 1.3.3(iii) -/
-theorem UnsignedMeasurable.inf {d:ℕ} {f: ℕ → EuclideanSpace' d → EReal} (hf: ∀ n, UnsignedMeasurable (f n)) : UnsignedMeasurable (fun x ↦ iInf (fun n ↦ f n x)) := by sorry
+theorem UnsignedMeasurable.inf {d:ℕ} {f: ℕ → EuclideanSpace' d → EReal} (hf: ∀ n, UnsignedMeasurable (f n)) : UnsignedMeasurable (fun x ↦ iInf (fun n ↦ f n x)) := by
+  have hnonneg : Unsigned (fun x ↦ iInf (fun n ↦ f n x)) := by
+    intro x
+    exact le_iInf fun n => (hf n).1 x
+  have h_iff : UnsignedMeasurable (fun x ↦ iInf (fun n ↦ f n x)) ↔
+      ∀ t, LebesgueMeasurable {x | iInf (fun n ↦ f n x) ≥ t} :=
+    (UnsignedMeasurable.TFAE hnonneg).out 0 5
+  apply h_iff.mpr
+  intro t
+  have h_eq : {x | iInf (fun n ↦ f n x) ≥ t} = ⋂ n, {x | f n x ≥ t} := by
+    ext x
+    simp only [Set.mem_setOf_eq, Set.mem_iInter]
+    exact le_iInf_iff
+  rw [h_eq]
+  refine LebesgueMeasurable.countable_inter fun n => ?_
+  have hn : UnsignedMeasurable (f n) ↔ ∀ t, LebesgueMeasurable {x | f n x ≥ t} :=
+    (UnsignedMeasurable.TFAE (hf n).1).out 0 5
+  exact hn.mp (hf n) t
 
 /-- Exercise 1.3.3(iii) -/
 theorem UnsignedMeasurable.limsup {d:ℕ} {f: ℕ → EuclideanSpace' d → EReal} (hf: ∀ n, UnsignedMeasurable (f n)) : UnsignedMeasurable (fun x ↦ Filter.atTop.limsup (fun n ↦ f n x) ) := by sorry
